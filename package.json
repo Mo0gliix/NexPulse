@@ -1,0 +1,10 @@
+{
+  "name": "nexpulse",
+  "version": "1.0.0",
+  "description": "NexPulse health monitoring platform",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  }
+}

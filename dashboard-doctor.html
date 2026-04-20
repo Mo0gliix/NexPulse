@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Clinician Dashboard — NexPulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Instrument+Serif&family=JetBrains+Mono:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="doctor.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="dash-body">
+
+<div class="grain"></div>
+
+<div class="dash-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="index.html" class="sb-logo">
+      <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 55 L30 55 L40 25 L55 75 L65 35 L75 55 L90 55" stroke="#67D6D6" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M15 65 L28 65 L38 40 L52 80 L62 45 L72 65 L90 65" stroke="#92E4E4" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+      </svg>
+      <span>Nex<span class="logo-accent-light">Pulse</span></span>
+    </a>
+
+    <nav class="sb-nav">
+      <div class="sb-section">Clinician</div>
+      <a href="#" class="sb-link active">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Overview
+      </a>
+      <a href="#patients" class="sb-link">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Patients
+        <span class="sb-badge" id="sbPatientCount">–</span>
+      </a>
+      <a href="#alerts" class="sb-link">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Alerts
+        <span class="sb-badge sb-badge-alert" id="sbAlertCount">–</span>
+      </a>
+      <a href="#" class="sb-link">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Appointments
+      </a>
+      <a href="ai-chat.html" class="sb-link">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>
+        PulseAI Assist
+      </a>
+      <a href="#" class="sb-link">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Reports
+      </a>
+
+      <div class="sb-section">Account</div>
+      <a href="#" class="sb-link">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+      <a href="login.html" class="sb-link">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </a>
+    </nav>
+
+    <div class="sb-user">
+      <div class="sb-user-avatar doc-avatar" id="sbAvatar">HM</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name" id="sbUserName">Doctor</div>
+        <div class="sb-user-role" id="sbUserRole">Clinician</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div>
+        <div class="topbar-greeting" id="topbarGreeting">Good morning 👋</div>
+        <h1 class="topbar-title" id="topbarTitle">Loading your roster…</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search patients, MRN, conditions...">
+          <kbd>⌘K</kbd>
+        </div>
+        <button class="icon-btn" title="Notifications">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="icon-dot"></span>
+        </button>
+        <div class="connect-pill">
+          <span class="live-dot"></span> 38 / 42 streaming live
+        </div>
+      </div>
+    </header>
+
+    <!-- STAT TILES -->
+    <section class="doc-stats reveal">
+      <div class="doc-stat">
+        <div class="doc-stat-icon" style="--stat-tint:#67D6D6">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="doc-stat-body">
+          <div class="doc-stat-label">Active patients</div>
+          <div class="doc-stat-value"><span id="statActive">–</span><span class="doc-stat-delta up">live</span></div>
+          <div class="doc-stat-foot">3 admitted this week</div>
+        </div>
+      </div>
+      <div class="doc-stat">
+        <div class="doc-stat-icon" style="--stat-tint:#e85a5a">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="doc-stat-body">
+          <div class="doc-stat-label">Critical alerts</div>
+          <div class="doc-stat-value"><span id="statAlerts">–</span><span class="doc-stat-delta">unresolved</span></div>
+          <div class="doc-stat-foot">vs yesterday</div>
+        </div>
+      </div>
+      <div class="doc-stat">
+        <div class="doc-stat-icon" style="--stat-tint:#f0b341">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="doc-stat-body">
+          <div class="doc-stat-label">Today's appointments</div>
+          <div class="doc-stat-value"><span id="statAppts">–</span><span class="doc-stat-delta">today</span></div>
+          <div class="doc-stat-foot">Next: 11:30 AM</div>
+        </div>
+      </div>
+      <div class="doc-stat">
+        <div class="doc-stat-icon" style="--stat-tint:#3FBDBD">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+        </div>
+        <div class="doc-stat-body">
+          <div class="doc-stat-label">Avg adherence</div>
+          <div class="doc-stat-value">94<span class="vital-unit">%</span><span class="doc-stat-delta up">+2.1</span></div>
+          <div class="doc-stat-foot">Roster 30-day avg</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALERTS + LIVE FEED -->
+    <section class="doc-grid-top reveal">
+      <!-- CRITICAL ALERTS -->
+      <article class="dash-card alerts-card" id="alerts">
+        <div class="card-head">
+          <div>
+            <div class="card-kicker">Live · auto-triaged by PulseAI</div>
+            <h2 class="card-title">Critical alerts</h2>
+          </div>
+          <a href="#" class="link-arrow">View all →</a>
+        </div>
+
+        <ul class="alert-list" id="alertList">
+          <li class="alert-item alert-critical">
+            <div class="alert-rail"></div>
+            <div class="alert-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div class="alert-body">
+              <div class="alert-head">
+                <span class="alert-patient">Mariam Khalid</span>
+                <span class="alert-tag tag-critical">Critical</span>
+              </div>
+              <div class="alert-msg">Sustained tachycardia detected — HR 142 bpm for 8 min</div>
+              <div class="alert-meta">2 min ago · Cardiology · MRN 0942</div>
+            </div>
+            <button class="alert-cta">Open</button>
+          </li>
+
+          <li class="alert-item alert-high">
+            <div class="alert-rail"></div>
+            <div class="alert-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <div class="alert-body">
+              <div class="alert-head">
+                <span class="alert-patient">Omar Saleh</span>
+                <span class="alert-tag tag-high">High</span>
+              </div>
+              <div class="alert-msg">SpO₂ trending down to 91% — possible nocturnal desaturation</div>
+              <div class="alert-meta">14 min ago · Pulmonology · MRN 0871</div>
+            </div>
+            <button class="alert-cta">Open</button>
+          </li>
+
+          <li class="alert-item alert-high">
+            <div class="alert-rail"></div>
+            <div class="alert-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            </div>
+            <div class="alert-body">
+              <div class="alert-head">
+                <span class="alert-patient">Layla Ahmed</span>
+                <span class="alert-tag tag-high">High</span>
+              </div>
+              <div class="alert-msg">Glucose reading 248 mg/dL · 38 min after dose missed</div>
+              <div class="alert-meta">31 min ago · Endocrinology · MRN 1108</div>
+            </div>
+            <button class="alert-cta">Open</button>
+          </li>
+
+          <li class="alert-item alert-med">
+            <div class="alert-rail"></div>
+            <div class="alert-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            </div>
+            <div class="alert-body">
+              <div class="alert-head">
+                <span class="alert-patient">Yusuf Karim</span>
+                <span class="alert-tag tag-med">Watch</span>
+              </div>
+              <div class="alert-msg">Sleep score dropped to 58 — 3rd consecutive low night</div>
+              <div class="alert-meta">1 h ago · General · MRN 0726</div>
+            </div>
+            <button class="alert-cta">Open</button>
+          </li>
+
+          <li class="alert-item alert-med">
+            <div class="alert-rail"></div>
+            <div class="alert-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+            </div>
+            <div class="alert-body">
+              <div class="alert-head">
+                <span class="alert-patient">Sarah Hassan</span>
+                <span class="alert-tag tag-med">Watch</span>
+              </div>
+              <div class="alert-msg">Heart-rate variability dipping below baseline (-12 ms)</div>
+              <div class="alert-meta">2 h ago · Cardiology · MRN 0445</div>
+            </div>
+            <button class="alert-cta">Open</button>
+          </li>
+        </ul>
+      </article>
+
+      <!-- AI BRIEF -->
+      <article class="dash-card card-ai">
+        <div class="ai-bg-glow"></div>
+        <div class="card-head">
+          <div>
+            <div class="card-kicker">
+              <span class="ai-tag-sm">AI</span> Daily clinical brief
+            </div>
+            <h2 class="card-title" style="color:white">Roster summary</h2>
+          </div>
+        </div>
+
+        <p class="ai-insight-text">
+          Across your 42 patients, <strong>5 require attention today</strong>. Cardiac cohort is largely stable;
+          two diabetic patients show post-prandial spikes worth a check-in. Sleep quality has dipped roster-wide
+          this week — likely seasonal.
+        </p>
+
+        <div class="brief-list">
+          <div class="brief-row">
+            <div class="brief-dot" style="background:#67D6D6"></div>
+            <div class="brief-text"><strong>Stable</strong> · 34 patients</div>
+            <div class="brief-pct">81%</div>
+          </div>
+          <div class="brief-row">
+            <div class="brief-dot" style="background:#f0b341"></div>
+            <div class="brief-text"><strong>Watch</strong> · 3 patients</div>
+            <div class="brief-pct">7%</div>
+          </div>
+          <div class="brief-row">
+            <div class="brief-dot" style="background:#e85a5a"></div>
+            <div class="brief-text"><strong>Critical</strong> · 5 patients</div>
+            <div class="brief-pct">12%</div>
+          </div>
+        </div>
+
+        <a href="ai-chat.html" class="ai-cta">
+          Ask PulseAI to draft notes <span>→</span>
+        </a>
+      </article>
+    </section>
+
+    <!-- PATIENT ROSTER -->
+    <section class="dash-card patients-card reveal" id="patients">
+      <div class="card-head">
+        <div>
+          <div class="card-kicker">Roster · 42 patients</div>
+          <h2 class="card-title">Patient list</h2>
+        </div>
+        <div class="card-tabs">
+          <button class="ctab active">All</button>
+          <button class="ctab">Critical · 5</button>
+          <button class="ctab">Watch · 3</button>
+          <button class="ctab">Stable</button>
+        </div>
+      </div>
+
+      <div class="patient-table-wrap">
+        <table class="patient-table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Status</th>
+              <th>HR</th>
+              <th>SpO₂</th>
+              <th>BP</th>
+              <th>Last reading</th>
+              <th>Adherence</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="patientBody">
+            <tr class="row-critical">
+              <td>
+                <div class="pt-cell">
+                  <div class="pt-avatar" style="--av:#e85a5a">MK</div>
+                  <div>
+                    <div class="pt-name">Mariam Khalid</div>
+                    <div class="pt-sub">F · 58 · MRN 0942</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-pill status-bad">Critical</span></td>
+              <td><span class="vt-bad">142 <small>bpm</small></span></td>
+              <td>96%</td>
+              <td>148/92</td>
+              <td><span class="time-ago">2 min ago</span></td>
+              <td>
+                <div class="adh-bar"><div class="adh-fill" style="--w:88%"></div></div>
+                <div class="adh-pct">88%</div>
+              </td>
+              <td><a href="#" class="row-open">Open →</a></td>
+            </tr>
+
+            <tr class="row-critical">
+              <td>
+                <div class="pt-cell">
+                  <div class="pt-avatar" style="--av:#f0b341">OS</div>
+                  <div>
+                    <div class="pt-name">Omar Saleh</div>
+                    <div class="pt-sub">M · 64 · MRN 0871</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-pill status-bad">Critical</span></td>
+              <td>78 <small>bpm</small></td>
+              <td><span class="vt-bad">91%</span></td>
+              <td>132/84</td>
+              <td><span class="time-ago">14 min ago</span></td>
+              <td>
+                <div class="adh-bar"><div class="adh-fill" style="--w:92%"></div></div>
+                <div class="adh-pct">92%</div>
+              </td>
+              <td><a href="#" class="row-open">Open →</a></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="pt-cell">
+                  <div class="pt-avatar" style="--av:#67D6D6">SH</div>
+                  <div>
+                    <div class="pt-name">Sarah Hassan</div>
+                    <div class="pt-sub">F · 32 · MRN 0445</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-pill status-warn">Watch</span></td>
+              <td>72 <small>bpm</small></td>
+              <td>98%</td>
+              <td>118/76</td>
+              <td><span class="time-ago">just now</span></td>
+              <td>
+                <div class="adh-bar"><div class="adh-fill" style="--w:96%"></div></div>
+                <div class="adh-pct">96%</div>
+              </td>
+              <td><a href="dashboard-patient.html" class="row-open">Open →</a></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="pt-cell">
+                  <div class="pt-avatar" style="--av:#9b8cf0">LA</div>
+                  <div>
+                    <div class="pt-name">Layla Ahmed</div>
+                    <div class="pt-sub">F · 47 · MRN 1108</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-pill status-bad">Critical</span></td>
+              <td>88 <small>bpm</small></td>
+              <td>97%</td>
+              <td>126/80</td>
+              <td><span class="time-ago">31 min ago</span></td>
+              <td>
+                <div class="adh-bar"><div class="adh-fill" style="--w:71%"></div></div>
+                <div class="adh-pct">71%</div>
+              </td>
+              <td><a href="#" class="row-open">Open →</a></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="pt-cell">
+                  <div class="pt-avatar" style="--av:#3FBDBD">YK</div>
+                  <div>
+                    <div class="pt-name">Yusuf Karim</div>
+                    <div class="pt-sub">M · 41 · MRN 0726</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-pill status-warn">Watch</span></td>
+              <td>69 <small>bpm</small></td>
+              <td>97%</td>
+              <td>122/78</td>
+              <td><span class="time-ago">1 h ago</span></td>
+              <td>
+                <div class="adh-bar"><div class="adh-fill" style="--w:84%"></div></div>
+                <div class="adh-pct">84%</div>
+              </td>
+              <td><a href="#" class="row-open">Open →</a></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="pt-cell">
+                  <div class="pt-avatar" style="--av:#e87da5">FR</div>
+                  <div>
+                    <div class="pt-name">Fatima Rashid</div>
+                    <div class="pt-sub">F · 29 · MRN 0612</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-pill status-good">Stable</span></td>
+              <td>66 <small>bpm</small></td>
+              <td>99%</td>
+              <td>112/72</td>
+              <td><span class="time-ago">3 min ago</span></td>
+              <td>
+                <div class="adh-bar"><div class="adh-fill" style="--w:99%"></div></div>
+                <div class="adh-pct">99%</div>
+              </td>
+              <td><a href="#" class="row-open">Open →</a></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="pt-cell">
+                  <div class="pt-avatar" style="--av:#5a8cf0">AT</div>
+                  <div>
+                    <div class="pt-name">Ahmad Tahir</div>
+                    <div class="pt-sub">M · 55 · MRN 0334</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-pill status-good">Stable</span></td>
+              <td>74 <small>bpm</small></td>
+              <td>98%</td>
+              <td>120/79</td>
+              <td><span class="time-ago">7 min ago</span></td>
+              <td>
+                <div class="adh-bar"><div class="adh-fill" style="--w:91%"></div></div>
+                <div class="adh-pct">91%</div>
+              </td>
+              <td><a href="#" class="row-open">Open →</a></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="pt-cell">
+                  <div class="pt-avatar" style="--av:#67D6D6">NA</div>
+                  <div>
+                    <div class="pt-name">Nour Abdallah</div>
+                    <div class="pt-sub">F · 38 · MRN 0998</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-pill status-good">Stable</span></td>
+              <td>71 <small>bpm</small></td>
+              <td>98%</td>
+              <td>116/74</td>
+              <td><span class="time-ago">12 min ago</span></td>
+              <td>
+                <div class="adh-bar"><div class="adh-fill" style="--w:95%"></div></div>
+                <div class="adh-pct">95%</div>
+              </td>
+              <td><a href="#" class="row-open">Open →</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-foot">
+        <span>Showing 8 of 42 patients</span>
+        <a href="#" class="link-arrow">View full roster →</a>
+      </div>
+    </section>
+
+    <!-- BOTTOM: Schedule + Cohort vitals -->
+    <section class="doc-grid-bottom reveal">
+      <article class="dash-card schedule-card">
+        <div class="card-head">
+          <div>
+            <div class="card-kicker">Today · Tuesday, April 17</div>
+            <h2 class="card-title">Schedule</h2>
+          </div>
+          <a href="#" class="link-arrow">Open calendar →</a>
+        </div>
+
+        <ul class="schedule-list">
+          <li class="sched-item sched-done">
+            <div class="sched-time">
+              <div class="st-time">8:30</div>
+              <div class="st-meridian">AM</div>
+            </div>
+            <div class="sched-body">
+              <div class="sched-title">Follow-up · Fatima Rashid</div>
+              <div class="sched-sub">Hypertension review · Room 204</div>
+            </div>
+            <span class="sched-badge done">Done</span>
+          </li>
+          <li class="sched-item sched-done">
+            <div class="sched-time">
+              <div class="st-time">9:15</div>
+              <div class="st-meridian">AM</div>
+            </div>
+            <div class="sched-body">
+              <div class="sched-title">Consult · Ahmad Tahir</div>
+              <div class="sched-sub">Post-op cardiac · Room 211</div>
+            </div>
+            <span class="sched-badge done">Done</span>
+          </li>
+          <li class="sched-item sched-done">
+            <div class="sched-time">
+              <div class="st-time">10:00</div>
+              <div class="st-meridian">AM</div>
+            </div>
+            <div class="sched-body">
+              <div class="sched-title">Telehealth · Nour Abdallah</div>
+              <div class="sched-sub">Annual check-in · Video</div>
+            </div>
+            <span class="sched-badge done">Done</span>
+          </li>
+          <li class="sched-item sched-now">
+            <div class="sched-time">
+              <div class="st-time">11:30</div>
+              <div class="st-meridian">AM</div>
+            </div>
+            <div class="sched-body">
+              <div class="sched-title">Consult · Mariam Khalid</div>
+              <div class="sched-sub">Tachycardia work-up · Room 204</div>
+            </div>
+            <span class="sched-badge now">Up next</span>
+          </li>
+          <li class="sched-item">
+            <div class="sched-time">
+              <div class="st-time">1:00</div>
+              <div class="st-meridian">PM</div>
+            </div>
+            <div class="sched-body">
+              <div class="sched-title">Telehealth · Sarah Hassan</div>
+              <div class="sched-sub">HRV review · Video</div>
+            </div>
+            <span class="sched-badge">12:00 buffer</span>
+          </li>
+          <li class="sched-item">
+            <div class="sched-time">
+              <div class="st-time">2:30</div>
+              <div class="st-meridian">PM</div>
+            </div>
+            <div class="sched-body">
+              <div class="sched-title">Consult · Omar Saleh</div>
+              <div class="sched-sub">Pulmonary review · Room 204</div>
+            </div>
+            <span class="sched-badge">In 3 h</span>
+          </li>
+        </ul>
+      </article>
+
+      <article class="dash-card cohort-card">
+        <div class="card-head">
+          <div>
+            <div class="card-kicker">Roster vitals · last 7 days</div>
+            <h2 class="card-title">Cohort trends</h2>
+          </div>
+        </div>
+
+        <div class="cohort-grid">
+          <div class="cohort-item">
+            <div class="cohort-label">Avg HR</div>
+            <div class="cohort-val">76 <small>bpm</small></div>
+            <div class="cohort-spark">
+              <svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0 18 Q15 12 25 16 T50 14 T75 17 T100 13" stroke="#67D6D6" stroke-width="2" fill="none"/></svg>
+            </div>
+          </div>
+          <div class="cohort-item">
+            <div class="cohort-label">Avg SpO₂</div>
+            <div class="cohort-val">97 <small>%</small></div>
+            <div class="cohort-spark">
+              <svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0 12 Q15 14 25 11 T50 13 T75 10 T100 12" stroke="#3FBDBD" stroke-width="2" fill="none"/></svg>
+            </div>
+          </div>
+          <div class="cohort-item">
+            <div class="cohort-label">Avg BP</div>
+            <div class="cohort-val">122/78</div>
+            <div class="cohort-spark">
+              <svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0 14 Q15 18 25 15 T50 17 T75 14 T100 16" stroke="#9b8cf0" stroke-width="2" fill="none"/></svg>
+            </div>
+          </div>
+          <div class="cohort-item">
+            <div class="cohort-label">Sleep score</div>
+            <div class="cohort-val">71 <small>/100</small></div>
+            <div class="cohort-spark">
+              <svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0 10 Q15 12 25 14 T50 17 T75 19 T100 22" stroke="#f0b341" stroke-width="2" fill="none"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="cohort-note">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Sleep quality across the roster is trending lower this week. Consider a wellness broadcast.
+        </div>
+      </article>
+    </section>
+
+  </main>
+</div>
+
+<script src="script.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/data.js"></script>
+<script>
+(async () => {
+  const profile = await auth.requireAuth('doctor');
+  if (!profile) return;
+
+  // ---- User chrome ----
+  const first    = (profile.full_name || '').split(' ').pop() || 'Doctor';
+  const initials = (profile.full_name || 'DR')
+    .split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('sbUserName').textContent = 'Dr. ' + profile.full_name;
+  document.getElementById('sbUserRole').textContent = profile.specialty
+    ? `${profile.specialty} · Clinical`
+    : 'Clinician';
+  document.getElementById('sbAvatar').textContent = initials;
+
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('topbarGreeting').textContent = `${greet}, Dr. ${first} 👋`;
+
+  // ---- Sign out ----
+  document.querySelectorAll('a[href="login.html"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      auth.signOut();
+    });
+  });
+
+  // ---- Load roster ----
+  const roster = await data.doctorRosterWithVitals(profile.id);
+  document.getElementById('statActive').textContent = roster.length;
+  document.getElementById('sbPatientCount').textContent = roster.length;
+  document.getElementById('topbarTitle').textContent =
+    roster.length
+      ? `${roster.length} patient${roster.length === 1 ? '' : 's'} under your care today.`
+      : 'No patients assigned yet — add some to get started.';
+
+  // Render roster rows
+  const tbody = document.getElementById('patientBody');
+  tbody.innerHTML = roster.map(p => {
+    const v = p.latest_vitals || {};
+    const inits = (p.full_name || 'NP')
+      .split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
+    const status = riskStatus(v);
+    const palette = ['#67D6D6','#9b8cf0','#f0b341','#3FBDBD','#e87da5','#5a8cf0'];
+    const tint = palette[Math.abs(hash(p.id)) % palette.length];
+    return `
+      <tr class="${status.rowClass}">
+        <td>
+          <div class="pt-cell">
+            <div class="pt-avatar" style="--av:${tint}">${inits}</div>
+            <div>
+              <div class="pt-name">${escapeHtml(p.full_name)}</div>
+              <div class="pt-sub">${p.sex || '—'} · MRN ${p.id.slice(0,4).toUpperCase()}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="status-pill ${status.pill}">${status.label}</span></td>
+        <td>${v.heart_rate ? `<span class="${v.heart_rate > 100 ? 'vt-bad' : ''}">${v.heart_rate} <small>bpm</small></span>` : '—'}</td>
+        <td>${v.spo2 ? `<span class="${v.spo2 < 93 ? 'vt-bad' : ''}">${v.spo2}%</span>` : '—'}</td>
+        <td>${v.bp_systolic ? `${v.bp_systolic}/${v.bp_diastolic ?? '—'}` : '—'}</td>
+        <td><span class="time-ago">${timeAgo(v.recorded_at)}</span></td>
+        <td>
+          <div class="adh-bar"><div class="adh-fill" style="--w:${90 + (Math.abs(hash(p.id)) % 10)}%"></div></div>
+          <div class="adh-pct">${90 + (Math.abs(hash(p.id)) % 10)}%</div>
+        </td>
+        <td><a href="#" class="row-open">Open →</a></td>
+      </tr>`;
+  }).join('') || `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--muted)">
+    No patients assigned yet. To see this dashboard with data, sign up a patient account and set their <code>assigned_doctor_id</code> to your user ID in Supabase.
+  </td></tr>`;
+
+  // ---- Appointments ----
+  const todayAppts = await data.todaysAppointments(profile.id);
+  document.getElementById('statAppts').textContent = todayAppts.length;
+
+  // ---- Alert feed ----
+  const alerts = await data.doctorAlertFeed(profile.id, 5);
+  document.getElementById('statAlerts').textContent = alerts.filter(a => !a.resolved).length;
+  document.getElementById('sbAlertCount').textContent = alerts.filter(a => !a.resolved).length;
+
+  const alertList = document.getElementById('alertList');
+  alertList.innerHTML = alerts.map(a => `
+    <li class="alert-item alert-${severityClass(a.severity)}">
+      <div class="alert-rail"></div>
+      <div class="alert-icon">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="alert-body">
+        <div class="alert-head">
+          <span class="alert-patient">${escapeHtml(a.patient_name || 'Patient')}</span>
+          <span class="alert-tag tag-${severityClass(a.severity)}">${a.severity}</span>
+        </div>
+        <div class="alert-msg">${escapeHtml(a.message)}</div>
+        <div class="alert-meta">${timeAgo(a.created_at)} · ${escapeHtml(a.category)}</div>
+      </div>
+      <button class="alert-cta">Open</button>
+    </li>
+  `).join('') || `<li style="text-align:center;padding:24px;color:var(--muted)">No active alerts. All patients stable.</li>`;
+})();
+
+// ---- helpers ----
+function riskStatus(v) {
+  if (!v) return { label: 'No data', pill: 'status-info', rowClass: '' };
+  if ((v.heart_rate && v.heart_rate > 120) || (v.spo2 && v.spo2 < 92) || (v.bp_systolic && v.bp_systolic > 160))
+    return { label: 'Critical', pill: 'status-bad', rowClass: 'row-critical' };
+  if ((v.heart_rate && (v.heart_rate > 100 || v.heart_rate < 50)) || (v.spo2 && v.spo2 < 95))
+    return { label: 'Watch', pill: 'status-warn', rowClass: '' };
+  return { label: 'Stable', pill: 'status-good', rowClass: '' };
+}
+function severityClass(s) {
+  if (s === 'critical') return 'critical';
+  if (s === 'high')     return 'high';
+  return 'med';
+}
+function timeAgo(iso) {
+  if (!iso) return 'never';
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60)    return `${s}s ago`;
+  if (s < 3600)  return `${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+  return `${Math.floor(s/86400)}d ago`;
+}
+function hash(str) {
+  let h = 0; for (let i = 0; i < str.length; i++) h = ((h<<5)-h) + str.charCodeAt(i);
+  return h;
+}
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
