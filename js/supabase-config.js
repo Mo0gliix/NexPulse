@@ -6,7 +6,7 @@
 
 // TODO: Replace these with YOUR values from Supabase dashboard
 //   (Dashboard → Project Settings → API)
-const SUPABASE_URL      = 'https://tckuzseqqfgqnxqnqmxy.supabase.co/rest/v1/';
+const SUPABASE_URL      = 'https://tckuzseqqfgqnxqnqmxy.supabase.co/rest/v1';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja3V6c2VxcWZncW54cW5xbXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2ODAxMDksImV4cCI6MjA5MjI1NjEwOX0.ycqept-UQsrbzPRS041fAOwEDSZpgLTtI329sGUGAnk';
 
 // Load Supabase JS library from CDN (no build tools needed)
